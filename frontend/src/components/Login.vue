@@ -1,6 +1,6 @@
 <template>
     <div id="fundo" class="d-flex flex-shrink-0">
-        <div v-if="true" style="width: 578px; background-color: #FAFBFE" class="d-flex align-center">
+        <div v-if="page == 0" style="width: 578px; background-color: #FAFBFE" class="d-flex align-center">
             <div style="width: 100%;" class="d-flex flex-column">
                 <span class="text-center titulo align-self-center" style="color: #282455;">
                     <span style="color: #E94E3B"> E aí, </span>bora 
@@ -30,23 +30,47 @@
                         x-large 
                         block 
                         @click="login"
-                    >LOGIN</v-btn>
-                    <v-btn color="#F5F8FF" style="color: #282455" class="rounded-lg mt-4" x-large block >CADASTRE-SE</v-btn>
-                    <span style='color: #E94E3B; text-decoration: underline;' class="mt-4" >Esqueci minha senha</span>
+                    >
+                        LOGIN
+                    </v-btn>
+                    <v-btn 
+                        color="#F5F8FF" 
+                        style="color: #282455" 
+                        class="rounded-lg mt-4" 
+                        x-large 
+                        block 
+                        @click="irCadastro"
+                    >
+                        CADASTRE-SE
+                    </v-btn>
+                    <v-btn
+                        text 
+                        style='color: #E94E3B; text-decoration: underline;' 
+                        class="mt-4 text-none"
+                        @click="irEsqueciMinhaSenha"
+                    >Esqueci minha senha</v-btn>
                 </div>
             </div>
         </div>
         <v-img
             src="../assets/imgs/background-login.svg"
+            :width="600"
         >
-            <div style="height: 100%;" class="d-flex justify-end">
+            <div style="height: 100%;" :class="'d-flex ' + ((page == 0) ? 'justify-start': 'justify-end')">
                 <div 
+                    v-if="page == 0"
+                    class="radiusRight align-self-center"
+                    style="height: 100%; width: 20px; background-color: #FAFBFE;"
+                ></div>
+                <div 
+                    v-else
                     class="radiusLeft align-self-center"
                     style="height: 100%; width: 20px; background-color: #FAFBFE;"
                 ></div>
             </div>
         </v-img>
-        <card-cadastro v-if="false" />
+        <card-cadastro v-if="page == 1" @voltarLogin='page = 0' />
+        <card-esqueci-minha-senha v-else-if="page == 2" />
         <!-- <v-snackbar
             v-model="snackbar"
             :timeout="timeout"
@@ -58,13 +82,23 @@
 
 <script>
     import CardCadastro from './shared/CardCadastro.vue'
+import CardEsqueciMinhaSenha from './shared/CardEsqueciMinhaSenha.vue';
 
     export default {
         name: 'Login',
-        components: { CardCadastro },
+        data: () => ({
+            page: 0, // 0 - Login, 1 - Cadastro de usuário, 2 - Esqueci minha senha
+        }),
+        components: { CardCadastro, CardEsqueciMinhaSenha },
         methods: {
             login() {
                 this.$router.push('/home').catch(() => {})
+            },
+            irCadastro() {
+                this.page = 1;
+            },
+            irEsqueciMinhaSenha() {
+                this.page = 2;
             }
         }
     }

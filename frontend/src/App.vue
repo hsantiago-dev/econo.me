@@ -24,12 +24,26 @@ export default {
   }
 
   .titulo {
-    font-size: 64px;
+    font-size: 60px;
     font-weight: bold;
   }
 
   .titulo2 {
-    font-size: 48px;
+    font-size: 44px;
     font-weight: bold;
+  }
+
+  .titulo3 {
+    font-size: 38px;
+    font-weight: bold;
+  }
+
+  .label {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .medium {
+    font-size: 20px;
   }
 </style>
