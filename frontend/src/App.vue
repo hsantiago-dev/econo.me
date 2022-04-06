@@ -1,18 +1,36 @@
 <template>
   <v-app>
-    <router-view></router-view>
+    <router-view @exibirMensagem='exibirMensagem'></router-view>
+    <v-snackbar
+		top
+		:color="corSnackbar"
+		v-model="snackbar"
+		timeout='3000'
+		class="mt-8"
+    >
+    <div class="pa-2">{{ text }}</div>
+    </v-snackbar>
   </v-app>
 </template>
 
 <script>
 
-export default {
-  name: 'App',
+	export default {
+		name: 'App',
+		data: () => ({
+			snackbar: false,
+			text: '',
+			corSnackbar: 'error'
+		}),
+		methods: {
+			exibirMensagem(text, cor = 'error') {
 
-  data: () => ({
-    //
-  }),
-};
+                this.text = text;
+                this.corSnackbar = cor;
+                this.snackbar = true;
+            },
+		}
+	};
 </script>
 
 <style>

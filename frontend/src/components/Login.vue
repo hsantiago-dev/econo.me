@@ -8,6 +8,7 @@
                 <span class="text-center titulo align-self-center mt-n6"  style="color: #282455;">dividir? </span>
                 <v-text-field
                     solo
+                    v-model="usuario"
                     label="usuario.usuario"
                     prepend-inner-icon="fa-solid fa-at"
                     color="#282455"
@@ -16,6 +17,7 @@
                 ></v-text-field>
                 <v-text-field
                     solo
+                    v-model="senha"
                     label="senha"
                     prepend-inner-icon="fa-solid fa-lock"
                     color="#282455"
@@ -71,29 +73,42 @@
         </v-img>
         <card-cadastro v-if="page == 1" @voltarLogin='page = 0' />
         <card-esqueci-minha-senha v-else-if="page == 2" />
-        <!-- <v-snackbar
-            v-model="snackbar"
-            :timeout="timeout"
-        >
-            {{ text }}
-        </v-snackbar> -->
     </div>
 </template>
 
 <script>
     import CardCadastro from './shared/CardCadastro.vue'
-import CardEsqueciMinhaSenha from './shared/CardEsqueciMinhaSenha.vue';
+    import CardEsqueciMinhaSenha from './shared/CardEsqueciMinhaSenha.vue';
+    import axios from '../axios'
 
     export default {
         name: 'Login',
         data: () => ({
             page: 0, // 0 - Login, 1 - Cadastro de usuário, 2 - Esqueci minha senha
+            usuario: '',
+            senha: '',
         }),
         components: { CardCadastro, CardEsqueciMinhaSenha },
         methods: {
-            login() {
-                this.$router.push('/home').catch(() => {})
+            async login() {
+
+                let body = {
+                    usuario: this.usuario,
+                    senha: this.senha
+                }
+
+                await axios.post('/login', body)
+                .then(res => {
+
+                    this.$emit('exibirMensagem', res.data, 'success');
+                    this.$router.push('/home').catch(() => {})
+                })
+                .catch(err => {
+
+                    this.$emit('exibirMensagem', err.response.data.errMsg);
+                })
             },
+            
             irCadastro() {
                 this.page = 1;
             },
