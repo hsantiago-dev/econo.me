@@ -1,14 +1,14 @@
 <template>
   <v-app>
-    <router-view @exibirMensagem='exibirMensagem'></router-view>
+    <router-view></router-view>
     <v-snackbar
-		top
-		:color="corSnackbar"
-		v-model="snackbar"
-		timeout='3000'
-		class="mt-8"
+      top
+      :color="corSnackbar"
+      v-model="snackbar"
+      timeout='3000'
+      class="mt-8"
     >
-    <div class="pa-2">{{ text }}</div>
+      <div class="pa-2">{{ text }}</div>
     </v-snackbar>
   </v-app>
 </template>
@@ -20,15 +20,21 @@
 		data: () => ({
 			snackbar: false,
 			text: '',
-			corSnackbar: 'error'
+			corSnackbar: 'error',
+      widthDisplay: window.innerWidth,
 		}),
+    computed: {
+      displayMobile() {
+        return this.widthDisplay <= 1263;
+      }
+    },
 		methods: {
 			exibirMensagem(text, cor = 'error') {
 
-                this.text = text;
-                this.corSnackbar = cor;
-                this.snackbar = true;
-            },
+        this.text = text;
+        this.corSnackbar = cor;
+        this.snackbar = true;
+      },
 		}
 	};
 </script>

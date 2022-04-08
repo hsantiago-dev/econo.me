@@ -1,6 +1,6 @@
 <template>
-    <div id="fundo" class="d-flex flex-shrink-0">
-        <div v-if="page == 0" style="width: 578px; background-color: #FAFBFE" class="d-flex align-center">
+    <div id="fundo" class="d-flex">
+        <div v-if="page == 0" style="background-color: #FAFBFE" class="d-flex align-center flex-grow-1">
             <div style="width: 100%;" class="d-flex flex-column">
                 <span class="text-center titulo align-self-center" style="color: #282455;">
                     <span style="color: #E94E3B"> E aí, </span>bora 
@@ -17,9 +17,11 @@
                 ></v-text-field>
                 <v-text-field
                     solo
+                    :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+                    :type="show ? 'text' : 'password'"
+                    @click:append="show = !show"
                     v-model="senha"
-                    label="senha"
-                    prepend-inner-icon="fa-solid fa-lock"
+                    label="Sua senha aqui"
                     color="#282455"
                     class="mx-8 mx-md-14 rounded-xl"
                     height="80"
@@ -54,25 +56,28 @@
                 </div>
             </div>
         </div>
-        <v-img
-            src="../assets/imgs/background-login.svg"
-            :width="600"
-        >
-            <div style="height: 100%;" :class="'d-flex ' + ((page == 0) ? 'justify-start': 'justify-end')">
-                <div 
-                    v-if="page == 0"
-                    class="radiusRight align-self-center"
-                    style="height: 100%; width: 20px; background-color: #FAFBFE;"
-                ></div>
-                <div 
-                    v-else
-                    class="radiusLeft align-self-center"
-                    style="height: 100%; width: 20px; background-color: #FAFBFE;"
-                ></div>
-            </div>
-        </v-img>
+        <div v-if="!displayMobile" class="flex-shrink-1">
+            <v-img
+                :width="widthImage"
+                src="../assets/imgs/background-login.svg"
+                style="height: 100%;"
+            >
+                <div style="height: 100%;" :class="'d-flex ' + ((page == 0) ? 'justify-start': 'justify-end')">
+                    <div 
+                        v-if="page == 0"
+                        class="radiusRight align-self-center"
+                        style="height: 100%; width: 20px; background-color: #FAFBFE;"
+                    ></div>
+                    <div 
+                        v-else
+                        class="radiusLeft align-self-center"
+                        style="height: 100%; width: 20px; background-color: #FAFBFE;"
+                    ></div>
+                </div>
+            </v-img>
+        </div>
         <card-cadastro v-if="page == 1" @voltarLogin='page = 0' />
-        <card-esqueci-minha-senha v-else-if="page == 2" />
+        <card-esqueci-minha-senha v-else-if="page == 2" @voltarLogin='page = 0' />
     </div>
 </template>
 
@@ -87,9 +92,34 @@
             page: 0, // 0 - Login, 1 - Cadastro de usuário, 2 - Esqueci minha senha
             usuario: '',
             senha: '',
+            widthImage: 900,
+            show: false,
+            displayMobile: false,
         }),
         components: { CardCadastro, CardEsqueciMinhaSenha },
+        mounted() {
+
+            this.$nextTick(() => {
+                window.addEventListener('resize', this.isMobile);
+            })
+        },
+        watch: {
+            page() {
+
+                if (this.page == 0)
+                    this.widthImage = 900;
+                else
+                    this.widthImage = 600;
+            }
+        },
+        beforeDestroy() { 
+            window.removeEventListener('resize', this.isMobile); 
+        },
         methods: {
+            isMobile() {
+                
+                this.displayMobile = window.innerWidth <= 1263;
+            },
             async login() {
 
                 let body = {
@@ -100,15 +130,14 @@
                 await axios.post('/login', body)
                 .then(res => {
 
-                    this.$emit('exibirMensagem', res.data, 'success');
+                    this.$root.$children[0].exibirMensagem(res.data, 'success');
                     this.$router.push('/home').catch(() => {})
                 })
                 .catch(err => {
 
-                    this.$emit('exibirMensagem', err.response.data.errMsg);
+                    this.$root.$children[0].exibirMensagem(err.response.data.errMsg);
                 })
             },
-            
             irCadastro() {
                 this.page = 1;
             },
