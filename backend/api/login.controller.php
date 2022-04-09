@@ -1,6 +1,7 @@
 <?php
 
    	$metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+	session_start();
 
   	if ($metodo == 'POST') {
 
@@ -25,16 +26,17 @@
 				$senhaValida = $body->senha;
 				}
 			}
-	
+
 			if (empty($nome) || empty($senhaValida)) {
 				
 				header("HTTP/1.0 400 Bad Request");
 				echo '{"errMsg": "Usuário e/ou senha inválido(s), Tente novamente!"}';
-				return;
 			} else {
 				
-				echo "Usuário $nome, Logado com Sucesso!";
-				return;
+				$token = md5(uniqid(microtime(), true));
+    			$_SESSION['token'] = $token;
+
+				echo "{\"token\": {$_SESSION['token']}}";
 			}
 		}
    	} else {
