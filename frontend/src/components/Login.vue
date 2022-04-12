@@ -130,7 +130,10 @@
                 await axios.post('/login', body)
                 .then(res => {
 
-                    this.$root.$children[0].exibirMensagem(res.data, 'success');
+                    // this.$root.$children[0].exibirMensagem(res.data, 'success');
+                    var expire = new Date();
+                    expire.setHours(expire.getHours() + 5);
+                    document.cookie = "PHPSESSID=" + res.data + "; expires=" + expire + "";
                     this.$router.push('/home').catch(() => {})
                 })
                 .catch(err => {

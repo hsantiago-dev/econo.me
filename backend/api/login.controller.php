@@ -1,7 +1,6 @@
 <?php
 
    	$metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-	session_start();
 
   	if ($metodo == 'POST') {
 
@@ -33,10 +32,14 @@
 				echo '{"errMsg": "Usuário e/ou senha inválido(s), Tente novamente!"}';
 			} else {
 				
-				$token = md5(uniqid(microtime(), true));
-    			$_SESSION['token'] = $token;
+				session_start();
 
-				echo "{\"token\": {$_SESSION['token']}}";
+				$token = md5(uniqid(microtime(), true));
+				$_SESSION['token'] = $token;
+				$_SESSION['logado'] = true; 
+				session_write_close();
+
+				echo session_id();
 			}
 		}
    	} else {
