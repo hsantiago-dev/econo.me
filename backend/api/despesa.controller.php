@@ -1,10 +1,8 @@
 <?php
 
-    require('backend\api\sessao.controller.php');
+    require('backend\services\sessao.controller.php');
 
-    var_dump($SESSION);
-
-    if (true) {
+    if ($logado) {
         
-        echo "{\"depesas\": [ \"despesa 1\", \"despesa 2\", \"despesa 3\" ]}";
+        echo "{\"despesas\": [ \"despesa 1\", \"despesa 2\", \"despesa 3\" ]}";
     }

@@ -43,7 +43,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
   #app {
-    background-color: #ddd;
+    background-color: #F2F4FA;
     font-family: 'Poppins', sans-serif;
   }
 
