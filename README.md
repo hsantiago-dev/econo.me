@@ -11,12 +11,13 @@ Integrantes:
 Necessário a configuração de um Virtual Host
 Em:  C:\xampp\apache\conf\extra\httpd-vhosts.conf
 Adicionar as linhas abaixo ao final do arquivo
-<VirtualHost *:80>
-	DocumentRoot "C:\xampp\htdocs\econo.me"
-	ServerName econo.me
-	<Directory "C:\xampp\htdocs\econo.me">
-	</Directory>
-</VirtualHost>
+
+	<VirtualHost *:80>
+		DocumentRoot "C:\xampp\htdocs\econo.me"
+		ServerName econo.me
+		<Directory "C:\xampp\htdocs\econo.me">
+		</Directory>
+	</VirtualHost>
 
 Deve-se adicionar também no arquivo C:\Windows\System32\drivers\etc\hosts a linha:
 127.0.0.1 econo.me
