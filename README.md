@@ -1,4 +1,10 @@
 # econo.me
+Integrantes:
+
+	Alexandre de Souza Vieira RA 1488880
+	
+	Henrick Bueno Santiago RA 2164426
+
 
 ---BACKEND-------------------------------
 
