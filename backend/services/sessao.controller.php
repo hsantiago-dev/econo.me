@@ -1,3 +1,5 @@
+
+
 <?php
 
     $logado = true;
@@ -12,6 +14,4 @@
 
         session_id($headers['Authorization']);
         session_start();
-    }
-
-    
+    } 

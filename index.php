@@ -2,7 +2,7 @@
 
   //Configs iniciais
   $recurso = $_SERVER['REQUEST_URI'] ?? 'index';
-  $controlador = "./backend$recurso.controller.php";
+  $controlador = explode("?","./backend$recurso");
 
   header('Content-Type: application/json; charset=utf-8');
 
@@ -24,10 +24,10 @@
     exit(0);
   }
 
-  if (file_exists($controlador)) {
+  if (file_exists($controlador[0])) {
 
     // Existe! Portanto puxe o controller
-    require($controlador);
+    require($controlador[0]);
   } else {
 
     // Serviço não encontrado

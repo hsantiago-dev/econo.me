@@ -8,14 +8,15 @@
         $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $logado = true;
         $bd = Conexao::get();
+        
 
         if ($logado) {
 
             $json = file_get_contents('php://input');
             $body = json_decode($json);
+          
 
-
-            if ($metodo == 'GET' && (!isset($body->id))) {  //busca geral, todos os items
+            if ($metodo == 'GET' && (!isset($_GET["id"]))) {  //busca geral, todos os items
 
                 $query = $bd->prepare('SELECT * FROM despesa');
                 $query->execute();
@@ -23,17 +24,15 @@
                 $despesas = $query->fetchAll(PDO::FETCH_OBJ);
                 echo json_encode($despesas);
                 return;
+            } elseif ($metodo == 'GET') {  // buscar por id
 
-            }elseif ($metodo == 'GET' ) {  // buscar por id
-
-                    $query = $bd->prepare('SELECT * FROM despesa where id = :id');
-                    $query->bindParam(':id', $body->id);
-                    $query->execute();
-                    $despesas[] = new Despesa();
-                    $despesas = $query->fetchAll(PDO::FETCH_OBJ);
-                    echo json_encode($despesas);
-                    return;
-                
+                $query = $bd->prepare('SELECT * FROM despesa where id = :id');
+                $query->bindParam(':id', $_GET["id"]);
+                $query->execute();
+                $despesas[] = new Despesa();
+                $despesas = $query->fetchAll(PDO::FETCH_OBJ);
+                echo json_encode($despesas);
+                return;
             } elseif ($metodo == 'POST') {
 
 
@@ -48,7 +47,7 @@
                 $query->bindParam(':valor_total', $body->valor);
                 $query->bindParam(':data_criacao', $body->data_criacao);
                 $query->execute();
-                echo '{"errMsg": "Cadastrado com Sucesso"}';// variável da msg só mudar o nome
+                echo '{"errMsg": "Cadastrado com Sucesso"}'; // variável da msg só mudar o nome
                 return;
             } elseif ($metodo == 'PUT') {
 
@@ -62,10 +61,7 @@
 
                     $query->bindParam(':id', $body->id);
 
-                    if (!isset($body->id)){   //só para testar a forma de captura de erros
-
-                        throw new MinhaExcecao(' ID EM BRANCO');
-                    }
+                  
 
                     $query->bindParam(':admin_despesa', $body->usuario);
                     $query->bindParam(':tipo_despesa', $body->tipo);
@@ -73,22 +69,38 @@
                     $query->bindParam(':titulo', $body->titulo);
                     $query->bindParam(':valor_total', $body->valor);
                     $query->bindParam(':data_criacao', $body->data_criacao);
-                    $query->execute();
+                    
+                    if ($query->rowCount(($query->execute()))==0) {   //só para testar a forma de captura de erros
+
+                        throw new MinhaExcecao('ID INEXISTENTE');
+                    }
                     echo '{"errMsg": "Cadastro Alterado com Sucesso"}';
                     return;
-
                 } catch (MinhaExcecao $e) {
 
-                    echo "{\"errMsg\":$e->getMessage()}";   //só para testar a forma de captura de erros
-                   
-                   
+                    $temp = [
+                        
+                        "errMsg" =>$e->getMessage()
+                    ];
+                    echo json_encode($temp);   //só para testar a forma de captura de erros
+                    // usar a variável dessa forma permite retornar o jason
+                  
+               
+
                 }
             } elseif ($metodo == 'DELETE') {
 
-                $query = $bd->prepare(" Delete FROM despesa where id = :id");
-                $query->bindParam(':id', $body->id);
-                $query->execute();
-                echo '{"errMsg": "Registro Deletado com Sucesso"}';
+                try {
+
+                    $query = $bd->prepare(" Delete FROM despesa where id = :id");
+                    $query->bindParam(':id', $body->id);
+                    $query->execute();
+                    echo '{"errMsg": "Registro Deletado com Sucesso"}';
+
+                } catch (PDOException $e) {
+
+                    throw new PDOException($e->getMessage());
+                }
             } else {
 
                 header("HTTP/1.0 400 Bad Request");
