@@ -1,8 +1,18 @@
 <?php
 
   //Configs iniciais
+ 
+
+  $rotas = [
+    "/usuario" => "./backend/api/usuario.controller.php",
+    "/despesa" => "./backend/api/despesa.controller.php",
+    "/login" => "./backend/api/login.controller.php",
+    "/logout" => "./backend/api/logout.controller.php",
+    "/recuperarsenha" =>"./backend/api/recuperar_senha.controller.php"
+
+  ];
   $recurso = $_SERVER['REQUEST_URI'] ?? 'index';
-  $controlador = explode("?","./backend$recurso");
+  $controlador = explode("?",$recurso)[0];
 
   header('Content-Type: application/json; charset=utf-8');
 
@@ -24,10 +34,15 @@
     exit(0);
   }
 
-  if (file_exists($controlador[0])) {
+  //if (file_exists($controlador[0])) {
 
     // Existe! Portanto puxe o controller
-    require($controlador[0]);
+   // require($controlador[0]);
+
+    if (array_key_exists($controlador,$rotas)){
+
+    require($rotas[$controlador]);
+
   } else {
 
     // Serviço não encontrado
