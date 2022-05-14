@@ -75,7 +75,7 @@ if ($logado) {
 
         try {
 
-            include('backend\api\cadastro.controller.php');
+            include('backend\services\validarform.controller.php');
             $usuario = new Usuario();
             $usuario->nome = $body->nome;
             $usuario->senha = $body->senha;
@@ -116,21 +116,23 @@ if ($logado) {
             echo json_encode($temp);   //só para testar a forma de captura de erros
             // usar a variável dessa forma permite retornar o jason
 
-        } 
-        
+        }
     } elseif ($metodo == 'PUT') {
 
-        $usuario = new Usuario();
-        //$usuario->id = $body->id;
-        $usuario->nome = $body->nome;
-        $usuario->senha = $body->senha;
-        $usuario->cpf = $body->cpf;
-        $usuario->email = $body->email;
-        $usuario->telefone_celular = $body->telefoneCelular;
-        $usuario->data_criacao = $body->data_criacao;
-        $usuario->nome_mae = $body->nomeMae;
 
         try {
+
+            include('backend\services\validarform.controller.php');
+
+
+            $usuario = new Usuario();
+            $usuario->nome = $body->nome;
+            $usuario->senha = $body->senha;
+            $usuario->cpf = preg_replace('/[^0-9]/', '', $body->cpf);
+            $usuario->email = $body->email;
+            $usuario->telefone_celular = preg_replace('/[^0-9]/', '', $body->telefone_celular);
+            $usuario->data_criacao = $body->data_criacao;
+            $usuario->nome_mae = $body->nome_mae;
 
             $query = $bd->prepare("UPDATE usuario SET  
             (nome, senha, cpf, email, telefone_celular, data_criacao,nome_mae)
@@ -139,7 +141,7 @@ if ($logado) {
             (:nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nome_mae)
              where id = :id");
 
-            $query->bindParam(':id', $_GET['id']); //com a global PUT não funcionou
+            $query->bindParam(':id', $body->id); //com a global PUT não funcionou
             //Funciona pegando no body e no get
 
 
@@ -151,6 +153,7 @@ if ($logado) {
             $query->bindParam(':telefone_celular', $usuario->telefone_celular);
             $query->bindParam(':data_criacao', $usuario->data_criacao);
             $query->bindParam(':nome_mae', $usuario->nome_mae);
+
             if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
 
                 throw new MinhaExcecao('Código de Usuário inexistente');

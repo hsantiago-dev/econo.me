@@ -2,7 +2,7 @@
 
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-if ($metodo == 'POST') {
+if (($metodo == 'POST') || ($metodo == 'PUT'))  {
 
     $json = file_get_contents('php://input');
     $body = json_decode($json);
@@ -16,7 +16,7 @@ if ($metodo == 'POST') {
     if (!validadorCPF($body->cpf)) {
 
         header("HTTP/1.0 400 Bad Request");
-        echo '{"errMsg": "CPF Inválido"}';
+       // echo '{"errMsg": "CPF Inválido"}';
         throw new MinhaExcecao('CPF inválido');
     }
 
@@ -25,7 +25,7 @@ if ($metodo == 'POST') {
     if (!validarNome($body->nome)) {
 
         header("HTTP/1.0 400 Bad Request");
-        echo '{"errMsg": "Nome Inválido"}';
+        //echo '{"errMsg": "Nome Inválido"}';
         throw new MinhaExcecao('Nome Inválido');
     }
 
@@ -33,7 +33,7 @@ if ($metodo == 'POST') {
     if (!validarNome($body->nome_mae)) {
 
         header("HTTP/1.0 400 Bad Request");
-        echo '{"errMsg": "Nome Mãe Inválido"}';
+       // echo '{"errMsg": "Nome Mãe Inválido"}';
         throw new MinhaExcecao('Nome da Mãe Inválido');
     }
 
@@ -44,7 +44,7 @@ if ($metodo == 'POST') {
     if (!validadorEmail($body->email)) {
 
         header("HTTP/1.0 400 Bad Request");
-        echo '{"errMsg": "Email Inválido"}';
+        //echo '{"errMsg": "Email Inválido"}';
         throw new MinhaExcecao('Email Inválido');
     }
 
@@ -52,10 +52,10 @@ if ($metodo == 'POST') {
 
 
     require('backend\function\validarDataNascimento.php');
-    if (!ValidadordtNascimento($body->data_criacao)) {
+    if (!ValidadordtNascimento($body->data_criacao,date_format(new DateTime('now'),'d-m-Y'))) {
 
         header("HTTP/1.0 400 Bad Request");
-        echo '{"errMsg": "Data de Nascimento Inválida!"}';
+        //echo '{"errMsg": "Data de Nascimento Inválida!"}';
         throw new MinhaExcecao('Data de Nascimento Inválida!');
     }
 

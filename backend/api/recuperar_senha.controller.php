@@ -6,6 +6,7 @@ require('backend\conexao\conexao.php');
 require('backend\model\usuario.php');
 require('backend\excecao\MinhaExcexao.php');
 
+
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $bd = Conexao::get();
 
@@ -28,8 +29,8 @@ if ($metodo == 'GET') {
         }
         $usuario = $query->fetchObject('Usuario');
 
-        //var_dump($usuario);
-        print($_GET['nome_mae']);
+        var_dump($usuario);
+        // print($_GET['nome_mae']);
 
 
         if (($usuario->email == $_GET['email']) && ($usuario->nome_mae == $_GET['nome_mae'])) {
@@ -40,10 +41,10 @@ if ($metodo == 'GET') {
             
             (:nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nome_mae)
              where email = :email");
-            $nova = 1234569;//colocar uma função hash
+            $novaSenha = uniqid(); //colocar uma função hash
 
-            $query->bindParam(':id', $usuario->id);
-            $query->bindParam(':senha', $nova);
+            // $query->bindParam(':id', $usuario->id);
+            $query->bindParam(':senha', $novaSenha);
             $query->bindParam(':nome', $usuario->nome);
             $query->bindParam(':cpf', $usuario->cpf);
             $query->bindParam(':email', $usuario->email);
@@ -55,13 +56,17 @@ if ($metodo == 'GET') {
 
                 throw new MinhaExcecao('Ocorreu um problema');
             }
+       
 
-            echo '{"errMsg": "Senha alterada com sucesso verifique seu e-mail"}';
-            return;
         } else {
 
             throw new MinhaExcecao('Email ou nome da mãe inválidos');
         }
+
+        include('backend\services\enviaremail.controller.php');
+        echo '{"errMsg": "Senha alterada com sucesso verifique seu e-mail"}';
+        return;
+        
     } catch (MinhaExcecao $e) {
 
         $temp = [

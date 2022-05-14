@@ -18,23 +18,55 @@
 
             if ($metodo == 'GET' && (!isset($_GET["id"]))) {  //busca geral, todos os items
 
+                try{
+
                 $query = $bd->prepare('SELECT * FROM despesa');
-                $query->execute();
+                if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+
+                throw new MinhaExcecao('Não existem Despesas Cadastradas');
+            }
                 $despesas[] = new Despesa();
                 $despesas = $query->fetchAll(PDO::FETCH_OBJ);
                 echo json_encode($despesas);
                 return;
+
+                } catch (MinhaExcecao $e) {
+
+                    $temp = [
+        
+                        "errMsg" => $e->getMessage()
+                    ];
+                    echo json_encode($temp);
+                }
+                
             } elseif ($metodo == 'GET') {  // buscar por id
+
+                try {
 
                 $query = $bd->prepare('SELECT * FROM despesa where id = :id');
                 $query->bindParam(':id', $_GET["id"]);
-                $query->execute();
+
+                if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+
+                    throw new MinhaExcecao('Despesa não encontrada');
+                }
                 $despesas[] = new Despesa();
                 $despesas = $query->fetchAll(PDO::FETCH_OBJ);
                 echo json_encode($despesas);
                 return;
+
+                }catch (MinhaExcecao $e) {
+
+                    $temp = [
+        
+                        "errMsg" => $e->getMessage()
+                    ];
+                    echo json_encode($temp);
+                }
+
             } elseif ($metodo == 'POST') {
 
+                try{
 
                 $query = $bd->prepare("INSERT INTO despesa
                 (admin_despesa, tipo_despesa, data_vencimento, titulo, valor_total, data_criacao)
@@ -46,9 +78,22 @@
                 $query->bindParam(':titulo', $body->titulo);
                 $query->bindParam(':valor_total', $body->valor);
                 $query->bindParam(':data_criacao', $body->data_criacao);
-                $query->execute();
+                if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+
+                    throw new MinhaExcecao('Despesa já Cadastrada!');
+                }
                 echo '{"errMsg": "Cadastrado com Sucesso"}'; // variável da msg só mudar o nome
                 return;
+                } catch (MinhaExcecao $e) {
+
+                    $temp = [
+        
+                        "errMsg" => $e->getMessage()
+                    ];
+                    echo json_encode($temp);   //só para testar a forma de captura de erros
+                    // usar a variável dessa forma permite retornar o jason
+        
+                } 
             } elseif ($metodo == 'PUT') {
 
                 try {
@@ -93,13 +138,21 @@
                 try {
 
                     $query = $bd->prepare(" Delete FROM despesa where id = :id");
-                    $query->bindParam(':id', $body->id);
-                    $query->execute();
+                    $query->bindParam(':id', $_GET['id']);
+                    if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+
+                        throw new MinhaExcecao('Essa Despesa não existe!');
+                    }
                     echo '{"errMsg": "Registro Deletado com Sucesso"}';
 
-                } catch (PDOException $e) {
+                } catch (MinhaExcecao $e) {
 
-                    throw new PDOException($e->getMessage());
+                    $temp = [
+        
+                        "errMsg" => $e->getMessage()
+                    ];
+                    echo json_encode($temp);   //só para testar a forma de captura de erros
+                    // usar a variável dessa forma permite retornar o jason
                 }
             } else {
 
