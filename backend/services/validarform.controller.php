@@ -30,7 +30,7 @@ if (($metodo == 'POST') || ($metodo == 'PUT'))  {
     }
 
 
-    if (!validarNome($body->nome_mae)) {
+    if (!validarNome($body->nomemae)) {
 
         header("HTTP/1.0 400 Bad Request");
        // echo '{"errMsg": "Nome Mãe Inválido"}';
@@ -72,6 +72,15 @@ if (($metodo == 'POST') || ($metodo == 'PUT'))  {
         throw new MinhaExcecao('Telefone Inválido');
     }
 
+    require('backend\function\validarUsuario.php');
+
+    if (!validarUsuario($body->usuario)) {
+
+        header("HTTP/1.0 400 Bad Request");
+        //echo '{"errMsg": "Nome Inválido"}';
+        //throw new MinhaExcecao('Usuario Inválido');
+    }
+
 
 
 
@@ -83,7 +92,8 @@ if (($metodo == 'POST') || ($metodo == 'PUT'))  {
         throw new MinhaExcecao('Senha deve ter no mínimo 6 caracteres e no máximo 12');
     }
 
-    require('backend\repository\user-repository.php');
+
+  /*   require('backend\repository\user-repository.php');
 
     $temp = false;
 
@@ -104,7 +114,7 @@ if (($metodo == 'POST') || ($metodo == 'PUT'))  {
         header("HTTP/1.0 400 Bad Request");
         echo '{"errMsg": "Usuário já Cadastrado!"}';
         return;
-    }
+    } */
 
 
     //code...

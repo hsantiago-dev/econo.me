@@ -78,18 +78,20 @@ if ($logado) {
             include('backend\services\validarform.controller.php');
             $usuario = new Usuario();
             $usuario->nome = $body->nome;
+            $usuario->usuario = $body->usuario;
             $usuario->senha = $body->senha;
             $usuario->cpf = preg_replace('/[^0-9]/', '', $body->cpf);
             $usuario->email = $body->email;
             $usuario->telefone_celular = preg_replace('/[^0-9]/', '', $body->telefone_celular);
             $usuario->data_criacao = $body->data_criacao;
-            $usuario->nome_mae = $body->nome_mae;
+            $usuario->nomemae = $body->nomemae;
 
 
             $query = $bd->prepare("INSERT INTO usuario
-        (nome, senha, cpf, email, telefone_celular, data_criacao,nome_mae)
+        (usuario, nome, senha, cpf, email, telefone_celular, data_criacao,nomemae)
         VALUES     
-        (:nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nome_mae)");
+        (:usuario, :nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nomemae)");
+            $query->bindParam(':usuario', $usuario->usuario);  
             $query->bindParam(':nome', $usuario->nome);
             $query->bindParam(':senha', $usuario->senha);
             $query->bindParam(':cpf', $usuario->cpf); //moditicado para body pra testar se o erro continua
@@ -98,14 +100,14 @@ if ($logado) {
             $query->bindParam(':email', $usuario->email);
             $query->bindParam(':telefone_celular', $usuario->telefone_celular);
             $query->bindParam(':data_criacao', $usuario->data_criacao);
-            $query->bindParam(':nome_mae', $usuario->nome_mae);
+            $query->bindParam(':nomemae', $usuario->nomemae);
 
 
             if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
 
                 throw new MinhaExcecao('Usuário já Cadastrado Verifique seu email e CPF');
             }
-            echo '{"errMsg": "Usuário Castrado com Sucesso"}';
+            echo '{"errMsg": "Usuário Cadastrado com Sucesso"}';
             return;
         } catch (MinhaExcecao $e) {
 
@@ -126,33 +128,34 @@ if ($logado) {
 
 
             $usuario = new Usuario();
+            $usuario->usuario = $body->usuario;
             $usuario->nome = $body->nome;
             $usuario->senha = $body->senha;
             $usuario->cpf = preg_replace('/[^0-9]/', '', $body->cpf);
             $usuario->email = $body->email;
             $usuario->telefone_celular = preg_replace('/[^0-9]/', '', $body->telefone_celular);
             $usuario->data_criacao = $body->data_criacao;
-            $usuario->nome_mae = $body->nome_mae;
+            $usuario->nomemae = $body->nomemae;
 
             $query = $bd->prepare("UPDATE usuario SET  
-            (nome, senha, cpf, email, telefone_celular, data_criacao,nome_mae)
+            (usuario,nome, senha, cpf, email, telefone_celular, data_criacao,nomemae)
             =
             
-            (:nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nome_mae)
+            (:usuario, :nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nomemae)
              where id = :id");
 
             $query->bindParam(':id', $body->id); //com a global PUT não funcionou
             //Funciona pegando no body e no get
 
 
-
+            $query->bindParam(':usuario', $usuario->usuario);
             $query->bindParam(':nome', $usuario->nome);
             $query->bindParam(':senha', $usuario->senha);
             $query->bindParam(':cpf', $usuario->cpf);
             $query->bindParam(':email', $usuario->email);
             $query->bindParam(':telefone_celular', $usuario->telefone_celular);
             $query->bindParam(':data_criacao', $usuario->data_criacao);
-            $query->bindParam(':nome_mae', $usuario->nome_mae);
+            $query->bindParam(':nomemae', $usuario->nomemae);
 
             if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
 

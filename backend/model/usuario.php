@@ -4,9 +4,13 @@
 
     protected $id;
     protected $usuario;
+    protected $nome;
+    protected $senha;
+    protected $nomemae;
     protected $cpf;
     protected $email;
     protected $telefone_celular;
+    protected $data_criacao;
 
     public function __construct()
     {
