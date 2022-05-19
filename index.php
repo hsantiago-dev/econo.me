@@ -8,8 +8,9 @@
     "/despesa" => "./backend/api/despesa.controller.php",
     "/login" => "./backend/api/login.controller.php",
     "/logout" => "./backend/api/logout.controller.php",
-    "/recuperarsenha" =>"./backend/api/recuperar_senha.controller.php"
-
+    "/recuperarsenha" => "./backend/api/recuperar_senha.controller.php",
+    "/tipo_despesa" => "./backend/api/tipo_despesa.controller.php",
+    "/teste" => "./backend/api/teste.controller.php"
   ];
   $recurso = $_SERVER['REQUEST_URI'] ?? 'index';
   $controlador = explode("?",$recurso)[0];

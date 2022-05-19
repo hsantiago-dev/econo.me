@@ -11,6 +11,8 @@
                 class="d-flex flex-column justify-space-between"
                 rounded
                 nav
+                v-model="item"
+                mandatory
             >  
                 <div class="d-flex flex-column">
                     <v-img
@@ -19,20 +21,26 @@
                         src="../assets/logo.svg"
                     >
                     </v-img>
-                    <v-list-item 
-                        v-for="page in pages"
-                        :key="page.icon"
-                        style="max-height: 65px"
-                        :to="page.route"
-                        link
+                    <v-list-item-group
+                        v-model="item"
+                        color="primary"
                     >
-                        <v-list-item-icon>
-                            <v-icon size="30">{{ page.icon }}</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title class="align-self-center mt-2 item-menu">
-                            {{ page.titulo }}
-                        </v-list-item-title>
-                    </v-list-item>
+                        <v-list-item 
+                            v-for="page in pages"
+                            :key="page.icon"
+                            style="max-height: 65px"
+                            :to="page.route"
+                            color="primary"
+                            link
+                        >
+                            <v-list-item-icon class="ml-2">
+                                <v-icon size="30">{{ page.icon }}</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-title class="align-self-center mt-2 item-menu">
+                                {{ page.titulo }}
+                            </v-list-item-title>
+                        </v-list-item>
+                    </v-list-item-group>
                 </div>
                 <v-list-item
                     style="max-height: 65px"
@@ -49,7 +57,7 @@
             </v-list>
         </v-navigation-drawer>
         <v-main>
-            <div class="d-flex mt-10 align-center flex-column">
+            <!-- <div class="d-flex mt-10 align-center flex-column">
                 <h1 class="mb-6">Despesas:</h1>
                 <v-card
                     width="300"
@@ -59,7 +67,8 @@
                 >
                     <v-card-title> {{index+1}} - {{despesa}}</v-card-title>
                 </v-card>
-            </div>
+            </div> -->
+            <visao-geral-despesas-page />
         </v-main>
     </v-app>
 </template>
@@ -67,11 +76,14 @@
 <script>
     import axios from '../axios'
     import { getToken } from '../config'
+    import VisaoGeralDespesasPage from './app/VisaoGeralDespesasPage.vue';
 
     export default {
+        components: { VisaoGeralDespesasPage },
         name: 'Home',
         data: () => ({
             sidemenu: true,
+            item: 0,
             pages: [
                 {
                     titulo: 'Início',
@@ -86,27 +98,9 @@
                     icon: 'fa-solid fa-gear'
                 },
             ],
-            despesas: [],
         }),
-        created() {
-            this.getDespesas();
-        },
         methods: {
 
-            async getDespesas() {
-
-                await axios.get('/despesa', getToken())
-                .then(res => {
-                    this.despesas = res.data.despesas;
-                })
-                .catch(err => {
-
-                    if (err.response.status == 401) {
-                        alert('Erro de autenticação! Por favor, logue novamente.');
-                        this.$router.push('/').catch(() => {})
-                    }
-                })
-            },
             async logout() {
 
                 await axios.post('/logout', {}, getToken())

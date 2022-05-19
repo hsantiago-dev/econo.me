@@ -7,5 +7,11 @@
     $json = file_get_contents('php://input');
     $body = json_decode($json, true);
     
-    echo $body['rateio'][0]['idUsuario'];
-    echo $body['rateio'][0]['valorRateio'];
+    for ($i = 0; $i < sizeof($body['rateio']); $i++) {
+
+        echo $body['rateio'][$i]['idUsuario'];
+        echo $body['rateio'][$i]['valorRateio'];
+        // echo "$i";
+    }
+
+    // echo sizeof($body['rateio']);

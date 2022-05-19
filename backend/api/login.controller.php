@@ -1,6 +1,9 @@
 <?php
 
+	require('backend\conexao\conexao.php');
+
    	$metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+	$bd = Conexao::get();
 
   	if ($metodo == 'POST') {
 
@@ -14,19 +17,17 @@
 			return;
 		} else {
 	
-			require('backend\repository\user-repository.php');
-	
-			foreach ($usuarios as $chave => $usuario) {
-	
-	
-				if (($chave == $body->usuario) && (($usuarios[$chave]['Senha']) == $body->senha)) {
-	
-				$nome = $body->usuario;
-				$senhaValida = $body->senha;
-				}
-			}
+			$query = $bd->prepare('SELECT id, nome, usuario FROM usuario
+									WHERE usuario = :usuario
+									AND senha = :senha
+									LIMIT 1');
+			$query->bindParam(':usuario', $body->usuario);
+			$query->bindParam(':senha', $body->senha);
+			$query->execute();
 
-			if (empty($nome) || empty($senhaValida)) {
+			$usuario = $query->fetchAll(PDO::FETCH_OBJ);
+			
+			if (empty($usuario[0]->id)) {
 				
 				header("HTTP/1.0 400 Bad Request");
 				echo '{"errMsg": "Usuário e/ou senha inválido(s), Tente novamente!"}';
@@ -37,9 +38,13 @@
 				$token = md5(uniqid(microtime(), true));
 				$_SESSION['token'] = $token;
 				$_SESSION['logado'] = true; 
+
+				$object = new stdClass();
+				$object->token = session_id();
+				$object->idUsuario = $usuario[0]->id;
 				session_write_close();
 
-				echo session_id();
+				echo json_encode($object);
 			}
 		}
    	} else {

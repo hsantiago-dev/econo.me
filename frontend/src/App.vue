@@ -62,6 +62,11 @@
     font-weight: bold;
   }
 
+  .titulo4 {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
   .label {
     font-size: 16px;
     font-weight: bold;

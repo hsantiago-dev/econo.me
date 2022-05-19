@@ -38,6 +38,7 @@
                     <div class="d-flex flex-column">
                         <v-text-field
                             single-line
+                            v-model="tituloDespesa"
                             class="rounded-xl"
                             label="Titulo da despesa aqui!"
                             solo
@@ -51,6 +52,7 @@
                             >
                                 <v-text-field
                                     single-line
+                                    v-model="vencimento"
                                     class="rounded-xl"
                                     appeend-icon='fa-solid fa-calendar-day'
                                     label="Vencimento"
@@ -66,6 +68,7 @@
                             >
                                 <v-combobox
                                     :items='tipo_despesas'
+                                    v-model="tipoDespesa"
                                     item-text='tipo'
                                     class="rounded-xl"
                                     label="Tipo de despesa"
@@ -134,6 +137,7 @@
                     x-large 
                     height="60" 
                     class="mt-6 gradienteBackground rounded-lg"
+                    @click="criarNovaDespesa"
                 >
                     LANÇAR despesa 
                     <v-icon class="ml-10">fa-solid fa-wallet</v-icon>
@@ -158,10 +162,13 @@
         },
         name: 'CardNovaDespesa',
         data: () => ({
+            tituloDespesa: '',
             valor_total: 0,
             dividirIgualmente: true,
             usuarios: [],
             tipo_despesas: [],
+            tipoDespesa: null,
+            vencimento: null,
             valores: [],
             valorFaltante: 0,
         }),
@@ -188,6 +195,22 @@
         },
         methods: {
 
+            criarNovaDespesa() {
+
+                let obj = {
+                    titulo: this.tituloDespesa,
+                    valorTotal: this.valor_total,
+                    tipoDespesa: this.tipoDespesa.id,
+                    rateio: []
+                }
+
+                for (let i = 0; i < this.usuarios.length; i++) {
+
+                    obj.rateio.push({ idUsuario: this.usuarios[i].id, valorRateio: this.valores[i] });
+                }
+
+                console.log(JSON.stringify(obj));
+            },
             calcularFaltante() {
                 
                 let soma = 0;

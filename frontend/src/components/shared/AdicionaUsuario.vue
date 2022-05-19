@@ -96,8 +96,7 @@
                 let matches = str.split(/\s/).reduce((response,word)=> response+=word.slice(0,1),''); 
                 matches = [ 
                     matches[0], 
-                    matches[1], 
-                    matches[2]
+                    matches[1],
                 ]
                 let acronym = matches.join('');
 
