@@ -12,6 +12,7 @@
     "/tipo_despesa" => "./backend/api/tipo_despesa.controller.php",
     "/teste" => "./backend/api/teste.controller.php"
   ];
+  require 'backend\vendor\autoload.php';
   $recurso = $_SERVER['REQUEST_URI'] ?? 'index';
   $controlador = explode("?",$recurso)[0];
 

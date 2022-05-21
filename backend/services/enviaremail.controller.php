@@ -1,52 +1,61 @@
 <?php
-// Importar as classes 
+
 use PHPMailer\PHPMailer\PHPMailer;
-require('backend\vendor\autoload.php');
 
-//apenas acertar esse caminho, internet falam muita merda inútil
-
-$mail = new PHPMailer();
-try
+class EnviarEmail
 {
-    // Configurações do servidor
-    $mail->isSMTP();        //Devine o uso de SMTP no envio
-    $mail->SMTPAuth = true; //Habilita a autenticação SMTP
-    $mail->Username   = 'utfprdev2019@gmail.com';
-    $mail->Password   = 'X/753951';
-    $mail->SMTPSecure = 'tls';
-    $mail->CharSet = 'UTF-8';// Incluir caracteres com acento
-    // Informações específicadas pelo Google
-    $mail->Host = 'smtp.gmail.com';
-    $mail->Port = 587;
-    // Define o remetente
-    $mail->setFrom('utfprdev2019@gmail.com', 'Equipe de Suporte Econo.me');
-    // Define o destinatário
-    print($usuario->email);
-    $mail->addAddress($usuario->email, $usuario->nome);
-    // Conteúdo da mensagem
-    $mail->isHTML(true);  // Seta o formato do e-mail para aceitar conteúdo HTML
-    $mail->Subject = 'Recuperação de Email Equipe Econo.me';
-    $mail->Body    = "Sua senha foi Atualizada com Sucesso! <b>Sua nova senha é  : {$novaSenha}</b>";
-    $mail->AltBody = "Sua nova senha é   : {$novaSenha}";
-    // Enviar
-    if(!$mail->send()){
+    protected $mail;
 
-        
-        throw new MinhaExcecao('A mensagem não foi enviada. Verifique se o Email foi digitado corretamente! :'.$mail->ErrorInfo);
-
-    }else{
-    
-    
-    throw new MinhaExcecao('A mensagem foi enviada!'); 
-    
+    public function __construct()
+    {
+        $this->mail = new PHPMailer();
     }
-    
-} catch (MinhaExcecao $e){
 
-    throw new MinhaExcecao($e->getMessage()); 
-    
-         
+    public function __get($propriedade)
+    {
+        return $this->$propriedade;
+    }
+
+    public function __set($propriedade, $valor)
+    {
+        return $this->$propriedade = $valor;
+    }
+
+    public function EnviarEmail($usuario, $novaSenha)
+    {
+        try {
+            // Configurações do servidor
+            $this->mail->isSMTP();        //Devine o uso de SMTP no envio
+            $this->mail->SMTPAuth = true; //Habilita a autenticação SMTP
+            $this->mail->Username   = 'utfprdev2019@gmail.com';
+            $this->mail->Password   = 'X/753951';
+            $this->mail->SMTPSecure = 'tls';
+            $this->mail->CharSet = 'UTF-8'; // Incluir caracteres com acento
+            // Informações específicadas pelo Google
+            $this->mail->Host = 'smtp.gmail.com';
+            $this->mail->Port = 587;
+            // Define o remetente
+            $this->mail->setFrom('utfprdev2019@gmail.com', 'Equipe de Suporte Econo.me');
+            // Define o destinatário
+            print($usuario->email);
+            $this->mail->addAddress($usuario->email, $usuario->nome);
+            // Conteúdo da mensagem
+            $this->mail->isHTML(true);  // Seta o formato do e-mail para aceitar conteúdo HTML
+            $this->mail->Subject = 'Recuperação de Email Equipe Econo.me';
+            $this->mail->Body    = "Sua senha foi Atualizada com Sucesso! <b>Sua nova senha é  : {$novaSenha}</b>";
+            $this->mail->AltBody = "Sua nova senha é   : {$novaSenha}";
+            // Enviar
+            if (!$this->mail->send()) {
+
+                throw new MinhaExcecao('A mensagem não foi enviada. Verifique se o Email foi digitado corretamente! : ' . $this->mail->ErrorInfo);
+                
+            } else {
+
+                throw new MinhaExcecao('A mensagem foi enviada!');
+            }
+        } catch (MinhaExcecao $e) {
+
+            throw new MinhaExcecao($e->getMessage());
+        }
+    }
 }
-
-
-

@@ -83,16 +83,10 @@
 
                 echo '{"errMsg": "Cadastrado com Sucesso"}'; // variável da msg só mudar o nome
                 return;
-                } catch (MinhaExcecao $e) {
-
-                    $temp = [
+                
+                   
         
-                        "errMsg" => $e->getMessage()
-                    ];
-                    echo json_encode($temp);   //só para testar a forma de captura de erros
-                    // usar a variável dessa forma permite retornar o jason
-        
-                } 
+                
             } elseif ($metodo == 'PUT') {
 
                 try {
