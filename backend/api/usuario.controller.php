@@ -24,14 +24,14 @@ if ($logado) {
 
         try {
 
-            $query = $bd->prepare('SELECT id, nome, usuario FROM usuario');
-            $query->execute();
-            // if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+            $query = $bd->prepare('SELECT * FROM usuario');
 
-            //     throw new MinhaExcecao('Não existem usuários cadastrados');
-            // }
+            if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
 
-            // $usuarios[] = new Usuario();
+                throw new MinhaExcecao('Não existem usuários cadastrados');
+            }
+
+            $usuarios[] = new Usuario();
             $usuarios = $query->fetchAll(PDO::FETCH_OBJ);
             echo json_encode($usuarios);
             return;
