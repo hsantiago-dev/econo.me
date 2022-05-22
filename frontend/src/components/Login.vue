@@ -133,7 +133,8 @@
                     // this.$root.$children[0].exibirMensagem(res.data, 'success');
                     var expire = new Date();
                     expire.setHours(expire.getHours() + 5);
-                    this.$store.dispatch('setUserId', res.data.idUsuario)
+                    this.$store.dispatch('setUserId', res.data.idUsuario);
+                    this.$store.dispatch('setUsername', this.usuario);
                     document.cookie = "PHPSESSID=" + res.data.token + "; expires=" + expire + "";
                     this.$router.push('/home').catch(() => {})
                 })

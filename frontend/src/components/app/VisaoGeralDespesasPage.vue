@@ -36,7 +36,7 @@
                                         Nova despesa
                                     </v-btn>
                                 </template>
-                                <CardNovaDespesa />
+                                <CardNovaDespesa @fecharDialog='dialog = false; getDespesas()' />
                             </v-dialog>
                         </div>
                         <v-data-table
@@ -52,10 +52,23 @@
                                     <v-icon v-else color="error">fa-solid fa-circle-xmark</v-icon>
                                 </div>
                             </template>
-                            <template v-slot:[`item.abrir`]>
-                                <v-btn elevation='1' color='#F2F4FA'>
-                                    <v-icon color='secondary'>fa-solid fa-money-check</v-icon>
-                                </v-btn>
+                            <template v-slot:[`item.abrir`]="{ item }">
+                                <v-dialog
+                                    v-model="dialogInfo"
+                                    width="1056"
+                                >
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn 
+                                            elevation='1' 
+                                            color='#F2F4FA' 
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        >
+                                            <v-icon color='secondary'>fa-solid fa-money-check</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <CardInfoDespesa :despesa='item' @fecharDialog='dialogInfo = false; getDespesas()' />
+                                </v-dialog>
                             </template>
                         </v-data-table>
                     </div>
@@ -75,7 +88,7 @@
                 <v-card
                     outlined 
                     class="font-weight-bold py-1 px-2 rounded-xl"
-                >@hsantiago_isso</v-card>
+                >@{{ username }}</v-card>
                 <v-card
                     class="pa-4 mt-6 rounded-xl d-flex flex-column"
                     style="width: 90%;"
@@ -86,7 +99,7 @@
                         :key="index"
                         class="d-flex justify-space-between mx-6 mt-4"
                     >
-                        <span>(15) 99643-2007</span>
+                        <span>(99) 99999-9999</span>
                         <v-icon color="#E94E3B">fa-solid fa-clone</v-icon>
                     </div>
                 </v-card>
@@ -109,14 +122,17 @@
     import axios from '../../axios'
     import { getToken } from '../../config'
     import CardNovaDespesa from '../shared/CardNovaDespesa'
+    import CardInfoDespesa from '../shared/CardInfoDespesa'
 
     export default {
         name: 'VisaoGeralDespesasPage',
         components: {
-            CardNovaDespesa
+            CardNovaDespesa,
+            CardInfoDespesa
         },
         data: () => ({
             dialog: false,
+            dialogInfo: false,
             headers: [
                 { text: 'Titulo', value: 'titulo' },
                 { text: 'Valor total', value: 'valor_total' },
@@ -130,6 +146,13 @@
         created() {
 
             this.getDespesas();
+        },
+        computed: {
+
+            username() {
+
+                return this.$store.getters.getUsername;
+            }
         },
         methods: {
 

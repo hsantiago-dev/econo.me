@@ -85,9 +85,9 @@
                             ref="telefone"
                             v-model="telefone"
                             :rules="[rules.required]"
-                            label="(00) 0000-0000"
+                            label="(00)0000-0000"
                             type="tel" 
-                            v-mask="['(##) #####-####']"
+                            v-mask="['(##)#####-####']"
                             :masked='true'
                             color="#282455"
                             class="rounded-xl mt-2"
@@ -218,6 +218,7 @@
 </template>
 
 <script>
+    import { getToken } from '../../config'
     import axios from '../../axios'
 
     export default {
@@ -308,14 +309,16 @@
                     nome: this.nome,
                     cpf: this.cpf,
                     email: this.email,
-                    dataNascimento: this.dataNascimento,
-                    telefone: this.telefone,
-                    nomeMae: this.nomeMae,
+                    // dataNascimento: this.dataNascimento,
+                    telefone_celular: this.telefone,
+                    nome_mae: this.nomeMae,
                     usuario: this.usuario,
                     senha: this.senha
                 }
 
-                await axios.post('/cadastro', body)
+                console.log(body);
+
+                await axios.post('/usuario', body, getToken())
                 .then(() => {
 
                     this.$root.$children[0].exibirMensagem('Usuário criado com sucesso!', 'success');

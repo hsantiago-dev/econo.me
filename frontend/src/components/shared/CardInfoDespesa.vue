@@ -9,7 +9,7 @@
                 <v-card width="20" class="ml-2 rounded-pill" style="height: 20px;" color='secondary'></v-card>
             </div>
             <span class="titulo4 primary--text mb-4">
-                Registre a nova despesa!
+                {{ despesa.titulo }}
             </span>
         </div>
         <div style="min-height: 170px; background-color: #F2F4FA" class="rounded-xl pb-4">
@@ -26,7 +26,7 @@
                     >
                         <span class="mt-4">Valor da despesa:</span>
                         <div class="mx-2 mt-4">
-                            <text-field-valor-total class="inputValor" v-model="valor_total" />
+                            <text-field-valor-total :readonly="true" class="inputValor" v-model="despesa.valor_total" />
                         </div>
                     </v-card>
                 </v-col>
@@ -35,66 +35,94 @@
                     cols='12'
                     md='7'
                 >
-                    <div class="d-flex flex-column">
-                        <v-text-field
-                            single-line
-                            v-model="tituloDespesa"
-                            class="rounded-xl"
-                            label="Titulo da despesa aqui!"
-                            solo
-                            hint='Titulo da despesa aqui!'
-                            color="secondary"
-                            height="75"
-                        ></v-text-field>
+                    <div class="d-flex flex-column justify-space-between">
                         <v-row no-gutters justify='space-between'>
-                            <v-col
-                                cols='5'
-                            >
-                                <v-text-field
-                                    single-line
-                                    v-model="vencimento"
-                                    class="rounded-xl"
-                                    appeend-icon='fa-solid fa-calendar-day'
-                                    label="Vencimento"
-                                    v-mask="['##/##/####']"
-                                    solo
-                                    hint='Vencimento da despesa, se houver.'
-                                    color="secondary"
-                                    height="75"
-                                ></v-text-field>
-                            </v-col>
                             <v-col
                                 cols='6'
                             >
-                                <v-combobox
-                                    :items='tipo_despesas'
-                                    v-model="tipoDespesa"
-                                    item-text='tipo'
-                                    class="rounded-xl"
-                                    label="Tipo de despesa"
-                                    solo
-                                    color="secondary"
-                                    height="75"
-                                ></v-combobox>
+                                <v-btn 
+                                    class="mt-6 mb-5" 
+                                    large
+                                    block
+                                    rounded
+                                    color="error"
+                                    @click="deleteDespesa"
+                                >
+                                    Excluir
+                                </v-btn>
                             </v-col>
+                            <v-col
+                                cols='5'
+                            >
+                                <div class="mt-8">
+                                    <span class="primary--text">Data de criação: <strong class="secondary--text">{{ despesa.data_criacao }}</strong></span> 
+                                </div>
+                            </v-col>
+                            <v-row class="mt-2" no-gutters justify='space-between'>
+                                <v-col
+                                    cols='5'
+                                >
+                                    <v-text-field
+                                        single-line
+                                        disabled
+                                        v-model="despesa.data_vencimento"
+                                        class="rounded-xl"
+                                        appeend-icon='fa-solid fa-calendar-day'
+                                        label="Vencimento"
+                                        v-mask="['##/##/####']"
+                                        solo
+                                        hint='Vencimento da despesa, se houver.'
+                                        color="secondary"
+                                        height="75"
+                                    ></v-text-field>
+                                </v-col>
+                                <v-col
+                                    cols='6'
+                                >
+                                    <v-combobox
+                                        :items='tipo_despesas'
+                                        v-model="tipoDespesa"
+                                        :readonly='true'
+                                        item-text='tipo'
+                                        class="rounded-xl"
+                                        label="Tipo de despesa"
+                                        solo
+                                        color="secondary"
+                                        height="75"
+                                    ></v-combobox>
+                                </v-col>
+                            </v-row>
                         </v-row>
                     </div>
                 </v-col>
             </v-row>
+            <div class="d-flex justify-center mx-4 mb-4">
+                <v-btn 
+                    dark 
+                    block
+                    color="success"
+                    x-large 
+                    height="60" 
+                    class="mt-6 rounded-lg"
+                >
+                    MARCAR COMO RECEBIDO
+                    <v-icon class="ml-8">fa-solid fa-circle-check</v-icon>
+                </v-btn>
+            </div>
             <v-row no-gutters style="background-color: #fff" class="mx-4 rounded-xl" >
                 <v-col
                     cols='12'
-                    class="py-1 d-flex justify-space-between align-center"
+                    class="py-4 d-flex justify-space-between align-center"
                 >
                     <span class="ml-10 medium">Integrantes:</span>
                     <div class="d-flex align-center">
-                        <span v-show="valorFaltante != 0" class="red--text mr-10">*Falta atribuir R$ {{ valorFaltante }}</span>
+                        <!-- <span v-show="valorFaltante != 0" class="red--text mr-10">*Falta atribuir R$ {{ valorFaltante }}</span>
                         <v-checkbox
                             class="mr-10"
                             v-model="dividirIgualmente"
                             label="Dividir igualmente"
-                        ></v-checkbox>
-                        <AdicionaUsuario @usuarioSelecionado='addUsuario' />
+                        ></v-checkbox> -->
+                        <!-- <AdicionaUsuario @usuarioSelecionado='addUsuario' /> -->
                     </div>
                 </v-col>
                 <v-col
@@ -115,34 +143,19 @@
                         <div class="d-flex align-center mr-10">
                             <text-field-valor-rateio 
                                 @input="calcularFaltante" 
-                                v-model='valores[index]'
-                                :disabled="dividirIgualmente"
+                                v-model='usuario.valor'
+                                :readonly="true"
                             />
                             <v-btn 
                                 fab small 
                                 elevation='0'
-                                color='white'
-                                @click="deleteUsuario(index)"
                             >
-                                <v-icon size="20" color='error'>fa-solid fa-trash-can</v-icon>
+                                <v-icon size="20" color='success'>fa-solid fa-circle-check</v-icon>
                             </v-btn>
                         </div>
                     </v-card>
                 </v-col>
             </v-row>
-            <div class="mx-4">
-                <v-btn 
-                    block 
-                    dark 
-                    x-large 
-                    height="60" 
-                    class="mt-6 gradienteBackground rounded-lg"
-                    @click="criarNovaDespesa"
-                >
-                    LANÇAR despesa 
-                    <v-icon class="ml-10">fa-solid fa-wallet</v-icon>
-                </v-btn>
-            </div>
         </div>
     </v-card>
 </template>
@@ -150,17 +163,20 @@
 <script>
     import axios from '../../axios';
     import { getToken } from '../../config';
-    import AdicionaUsuario from './AdicionaUsuario.vue';
+    // import AdicionaUsuario from './AdicionaUsuario.vue';
     import TextFieldValorRateio from './TextFieldValorRateio.vue';
     import TextFieldValorTotal from './TextFieldValorTotal.vue';
 
     export default {
         components: { 
-            AdicionaUsuario,
+            // AdicionaUsuario,
             TextFieldValorTotal, 
             TextFieldValorRateio
         },
-        name: 'CardNovaDespesa',
+        name: 'CardInfoDespesa',
+        props: {
+            despesa: { type: Object, required: true },
+        },
         data: () => ({
             tituloDespesa: '',
             valor_total: 0,
@@ -172,9 +188,13 @@
             valores: [],
             valorFaltante: 0,
         }),
-        created() {
+        async created() {
 
-            this.getTiposDespesas();
+            await this.getTiposDespesas();
+            await this.getRateios();
+
+            let aux = this.tipo_despesas.find(el => el.id == this.despesa.id_tipo_despesa);
+            this.tipoDespesa = aux;
         },
         watch: {
             usuarios: {
@@ -195,40 +215,33 @@
         },
         methods: {
 
-            async criarNovaDespesa() {
+            async deleteDespesa() {
+                
+                await axios.delete('/despesa?id=' + this.despesa.id, getToken())
+                .catch(err => {
 
-                let obj = {
-                    titulo: this.tituloDespesa,
-                    valor_total: Number(this.valor_total),
-                    tipo_despesa: this.tipoDespesa.id,
-                    vencimento: this.vencimento,
-                    id_admin: this.$store.getters.getUserId,
-                    rateio: []
-                }
-
-                for (let i = 0; i < this.usuarios.length; i++) {
-
-                    obj.rateio.push({ idUsuario: this.usuarios[i].id, valorRateio: this.valores[i].toFixed(2) });
-                }
-
-                console.log(JSON.stringify(obj));
-
-                await axios.post('/despesa', obj, getToken())
-                .then(() => {
-
-                    this.$root.$children[0].exibirMensagem("Despesa criada com sucesso!", 'success');
+                    if (err.response.status == 401) {
+                        alert('Erro de autenticação! Por favor, logue novamente.');
+                        this.$router.push('/').catch(() => {})
+                    }
                 })
                 .finally(() => {
-
-                    this.tituloDespesa = '';
-                    this.valor_total = 0;
-                    this.dividirIgualmente = true;
-                    this.usuarios = [];
-                    this.tipoDespesa = null;
-                    this.vencimento = null;
-                    this.valores = [];
-                    this.valorFaltante = 0;
                     this.$emit('fecharDialog');
+                })
+            },
+            async getRateios() {
+
+                await axios.get('/despesa?id=' + this.despesa.id, getToken())
+                .then(res => {
+
+                    this.usuarios = res.data;
+                })
+                .catch(err => {
+
+                    if (err.response.status == 401) {
+                        alert('Erro de autenticação! Por favor, logue novamente.');
+                        this.$router.push('/').catch(() => {})
+                    }
                 })
             },
             calcularFaltante() {
@@ -297,7 +310,7 @@
 
 <style scoped>
 
-    .cardNovaDespesa {
+    .cardDespesa {
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
     }

@@ -11,23 +11,20 @@ $json = file_get_contents('php://input');
 $body = json_decode($json);
 
 
-if ($metodo == 'GET') {
+if ($metodo == 'POST') {
 
     try {
 
         $usuario = new Usuario();
         $usuario = $usuario->getUserEmail($body->email, $bd);
 
-        var_dump($usuario);
-
         $enviar = new EnviarEmail();
         $novaSenha = uniqid();
-        $usuario->updateSenha($bd, $usuario, $novaSenha, $body->email, $body->nomemae);
+        $usuario->updateSenha($bd, $usuario, $novaSenha, $body->email, $body->nome_mae);
         $enviar->EnviarEmail($usuario, $novaSenha);
-        echo '{"errMsg": "Senha alterada com sucesso verifique seu e-mail"}';
-        return;
     } catch (MinhaExcecao $e) {
 
+        header("HTTP/1.0 400 Bad Request");
         $temp = [
 
             "errMsg" => $e->getMessage()

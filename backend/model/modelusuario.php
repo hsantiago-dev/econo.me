@@ -8,7 +8,7 @@ class Usuario extends BD
     protected $usuario;
     protected $nome;
     protected $senha;
-    protected $nomemae;
+    protected $nome_mae;
     protected $cpf;
     protected $email;
     protected $telefone_celular;
@@ -31,14 +31,10 @@ class Usuario extends BD
     public function getAll($tabela, $bd)
     {
 
-        $query = $bd->prepare("SELECT * FROM {$tabela}");
+        $query = $bd->prepare("SELECT id, nome, usuario FROM usuario");
 
-        if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+        $query->execute();
 
-            throw new MinhaExcecao('Não existem usuários cadastrados');
-        }
-
-        $usuarios[] = new Usuario();
         $usuarios = $query->fetchAll(PDO::FETCH_OBJ);
         return json_encode($usuarios);
         
@@ -50,12 +46,14 @@ class Usuario extends BD
         $query = $bd->prepare("SELECT * FROM {$tabela} where id = :id");
         $query->bindParam(':id', $id);
 
-        if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+        $query->execute();
+        if ($query->rowCount() == 0) { 
 
+            header("HTTP/1.0 400 Bad Request");
             throw new MinhaExcecao('Usuário não encontrado');
         }
 
-         $usuarios[] = new Usuario();
+        //  $usuarios[] = new Usuario();
          $usuarios = $query->fetchAll(PDO::FETCH_OBJ);
          return json_encode($usuarios);
                        
@@ -64,47 +62,59 @@ class Usuario extends BD
     public  function getUserEmail($email, $bd)
     {
 
-        $query = $bd->prepare('SELECT * FROM usuario where email = :email');
-        $query->bindParam(':email', $email);
+        try {
 
-        if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+            $query = $bd->prepare('SELECT * FROM usuario where email = :email');
+            $query->bindParam(':email', $email);
+            
+            $query->execute();
 
-            throw new MinhaExcecao('Usuário não cadastrado');
+            if ($query->rowCount() != 1) {
+
+                header("HTTP/1.0 400 Bad Request");
+                throw new MinhaExcecao('E-mail não cadastrado.');
+            }
+
+            return $query->fetchObject('Usuario');
+        } catch (PDOException $e) {
+
+            header("HTTP/1.0 400 Bad Request");
+            throw new MinhaExcecao('Usuário não cadastrado.');
         }
-        return $query->fetchObject('Usuario');
     }
 
 
     public  function insert($tabela, $bd, $usuario)
     {
+        try {
 
-        $query = $bd->prepare("INSERT INTO usuario
-        (usuario, nome, senha, cpf, email, telefone_celular, data_criacao,nomemae)
-        VALUES     
-        (:usuario, :nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nomemae)");
-        $query->bindParam(':usuario', $usuario->usuario);
-        $query->bindParam(':nome', $usuario->nome);
-        $query->bindParam(':senha', $usuario->senha);
-        $query->bindParam(':cpf', $usuario->cpf); 
-        $query->bindParam(':email', $usuario->email);
-        $query->bindParam(':telefone_celular', $usuario->telefone_celular);
-        $query->bindParam(':data_criacao', $usuario->data_criacao);
-        $query->bindParam(':nomemae', $usuario->nomemae);
+            $query = $bd->prepare("INSERT INTO usuario
+            (usuario, nome, senha, cpf, email, telefone_celular, data_criacao,nome_mae)
+            VALUES     
+            (:usuario, :nome, :senha, :cpf, :email, :telefone_celular, current_date,:nome_mae)");
+            $query->bindParam(':usuario', $usuario->usuario);
+            $query->bindParam(':nome', $usuario->nome);
+            $query->bindParam(':senha', $usuario->senha);
+            $query->bindParam(':cpf', $usuario->cpf); 
+            $query->bindParam(':email', $usuario->email);
+            $query->bindParam(':telefone_celular', $usuario->telefone_celular);
+            $query->bindParam(':nome_mae', $usuario->nome_mae);
 
-
-        if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
-
-            throw new MinhaExcecao('Usuário já Cadastrado Verifique seu email e CPF');
+            $query->execute();
+        } catch (PDOException $e) {
+            
+            header("HTTP/1.0 400 Bad Request");
+            throw new MinhaExcecao('Usuário já cadastrado! Verifique seu email e CPF.');
         }
     }
 
     public function update($tabela, $bd, $usuario)
     {
         $query = $bd->prepare("UPDATE {$tabela} SET  
-        (usuario,nome, senha, cpf, email, telefone_celular, data_criacao,nomemae)
+        (usuario,nome, senha, cpf, email, telefone_celular, data_criacao,nome_mae)
         =
         
-        (:usuario, :nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nomemae)
+        (:usuario, :nome, :senha, :cpf, :email, :telefone_celular, :data_criacao,:nome_mae)
          where id = :id");
 
         $query->bindParam(':id', $usuario->id); 
@@ -116,30 +126,36 @@ class Usuario extends BD
         $query->bindParam(':email', $usuario->email);
         $query->bindParam(':telefone_celular', $usuario->telefone_celular);
         $query->bindParam(':data_criacao', $usuario->data_criacao);
-        $query->bindParam(':nomemae', $usuario->nomemae);
+        $query->bindParam(':nome_mae', $usuario->nome_mae);
 
         if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
 
+            header("HTTP/1.0 400 Bad Request");
             throw new MinhaExcecao('Código de Usuário inexistente');
         }
     }
 
-    public function updateSenha($bd, $usuario, $novaSenha,$email,$nomemae)
+    public function updateSenha($bd, $usuario, $novaSenha,$email,$nome_mae)
     {
 
-        if (($usuario->email == $email) && ($usuario->nomemae == $nomemae)) {
+        if (($usuario->email == $email) && ($usuario->nome_mae == $nome_mae)) {
 
-            $query = $bd->prepare("UPDATE usuario SET  (senha)=(:senha)
-             where email = :email");
-            $query->bindParam(':email', $usuario->email);
-            $query->bindParam(':senha', $novaSenha);
+            try {
 
-            if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+                $query = $bd->prepare("UPDATE usuario SET  senha=:senha
+                                        WHERE email = :email");
+                $query->bindParam(':email', $usuario->email);
+                $query->bindParam(':senha', $novaSenha);
 
-                throw new MinhaExcecao('Ocorreu um problema');
+                $query->execute();
+            } catch (PDOException $e) {
+
+                header("HTTP/1.0 400 Bad Request");
+                throw new MinhaExcecao($e);
             }
         } else {
 
+            header("HTTP/1.0 400 Bad Request");
             throw new MinhaExcecao('Email ou nome da mãe inválidos');
         }
     }
@@ -152,6 +168,7 @@ class Usuario extends BD
 
         if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
 
+            header("HTTP/1.0 400 Bad Request");
             throw new MinhaExcecao('Esse usuário não existe!');
         }
     }

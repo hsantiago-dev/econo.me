@@ -14,8 +14,7 @@
 
             $json = file_get_contents('php://input');
             $body = json_decode($json, true);
-          
-
+            
             if ($metodo == 'GET' && (isset($_GET["usuario"]))) {  //busca geral, todos os items
 
                 $query = $bd->prepare("SELECT 
@@ -26,26 +25,54 @@
                                         , TO_CHAR(des.data_criacao, 'DD/MM/YYYY') data_criacao
                                         , rat.valor
                                         , TO_CHAR(rat.data_pagamento, 'DD/MM/YYYY') data_pagamento
+                                        , des.tipo_despesa id_tipo_despesa
+                                        , TO_CHAR(des.data_vencimento, 'DD/MM/YYYY') data_vencimento
                                     FROM despesa des
                                     INNER JOIN rateio rat
                                     ON des.id = rat.id_despesa
                                     WHERE rat.id_usuario = :id_usuario");
                 $query->bindParam(':id_usuario', $_GET["usuario"]);
                 $query->execute();
-                // $despesas[] = new Despesa();
+                
                 $despesas = $query->fetchAll(PDO::FETCH_OBJ);
                 echo json_encode($despesas);
                 return;
-            } elseif ($metodo == 'GET' && (isset($_GET["id"]))) {  // buscar por id
+            } elseif ($metodo == 'GET' && (isset($_GET["id"]))) {  // buscar rateios por id de despesa
 
                 try {
 
-                $query = $bd->prepare('SELECT * FROM despesa where id = :id');
-                $query->bindParam(':id', $_GET["id"]);
-                $query->execute();
-                // $despesas[] = new Despesa();
-                $despesas = $query->fetchAll(PDO::FETCH_OBJ);
-                echo json_encode($despesas);
+                // $query = $bd->prepare('SELECT 
+                //                             des.id
+                //                             , des.admin_despesa
+                //                             , des.data_vencimento
+                //                             , des.titulo
+                //                             , des.valor_total
+                //                             , des.data_criacao
+                //                             , tip.id id_tipo_despesa
+                //                             , tip.tipo tipo_despesa
+                //                         FROM despesa des
+                //                         LEFT JOIN tipo_despesa tip
+                //                         ON tip.id = des.tipo_despesa
+                //                         WHERE des.id = :id');
+                // $query->bindParam(':id', $_GET["id"]);
+                // $query->execute();
+                // $despesa = $query->fetchAll(PDO::FETCH_OBJ);
+
+                $queryRateios = $bd->prepare('SELECT 
+                                                rat.*
+                                                , usu.usuario
+                                                , usu.nome
+                                            FROM rateio rat
+                                            INNER JOIN usuario usu
+                                            ON rat.id_usuario = usu.id
+                                            WHERE rat.id_despesa = :id');
+                $queryRateios->bindParam(':id', $_GET["id"]);
+                $queryRateios->execute();
+
+                $rateios = $queryRateios->fetchAll(PDO::FETCH_OBJ);
+                // $despesa['rateio'] = $rateios;
+
+                echo json_encode($rateios);
                 return;
 
                 }catch (MinhaExcecao $e) {
@@ -65,7 +92,7 @@
                 (:admin_despesa, :tipo_despesa, :data_vencimento, :titulo, :valor_total, current_date)");
                 $query->bindParam(':admin_despesa', $body['id_admin']);
                 $query->bindParam(':tipo_despesa', $body['tipo_despesa']);
-                $query->bindParam(':data_vencimento', $body['data_vencimento']);
+                $query->bindParam(':data_vencimento', $body['vencimento']);
                 $query->bindParam(':titulo', $body['titulo']);
                 $query->bindParam(':valor_total', $body['valor_total']);
                 $query->execute();
@@ -83,10 +110,6 @@
 
                 echo '{"errMsg": "Cadastrado com Sucesso"}'; // variável da msg só mudar o nome
                 return;
-                
-                   
-        
-                
             } elseif ($metodo == 'PUT') {
 
                 try {
@@ -130,13 +153,16 @@
 
                 try {
 
-                    $query = $bd->prepare(" Delete FROM despesa where id = :id");
-                    $query->bindParam(':id', $_GET['id']);
-                    if ($query->rowCount(($query->execute())) == 0) {   //só para testar a forma de captura de erros
+                    $deleteRateios = $bd->prepare("DELETE FROM rateio where id_despesa = :id");
+                    $deleteRateios->bindParam(':id', $_GET['id']);
+                    $deleteRateios->execute();
 
-                        throw new MinhaExcecao('Essa Despesa não existe!');
-                    }
-                    echo '{"errMsg": "Registro Deletado com Sucesso"}';
+                    $delete = $bd->prepare("DELETE FROM despesa where id = :id");
+                    $delete->bindParam(':id', $_GET['id']);
+                    $delete->execute();
+
+                    header("HTTP/1.0 HTTP 204 Resource Deleted Successfully");
+                    return;
 
                 } catch (MinhaExcecao $e) {
 
@@ -144,6 +170,7 @@
         
                         "errMsg" => $e->getMessage()
                     ];
+                    header("HTTP/1.0 400 Bad Request");
                     echo json_encode($temp);   //só para testar a forma de captura de erros
                     // usar a variável dessa forma permite retornar o jason
                 }

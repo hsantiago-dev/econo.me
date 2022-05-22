@@ -61,8 +61,7 @@ if ($logado) {
             $usuario->cpf = preg_replace('/[^0-9]/', '', $body->cpf);
             $usuario->email = $body->email;
             $usuario->telefone_celular = preg_replace('/[^0-9]/', '', $body->telefone_celular);
-            $usuario->data_criacao = $body->data_criacao;
-            $usuario->nomemae = $body->nomemae;
+            $usuario->nome_mae = $body->nome_mae;
 
             $usuario->insert('usuario', $bd, $usuario);
 

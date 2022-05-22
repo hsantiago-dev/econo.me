@@ -34,7 +34,7 @@ class ValidarForm
             }
 
 
-            if (!validarNome($body->nomemae)) {
+            if (!validarNome($body->nome_mae)) {
 
                 header("HTTP/1.0 400 Bad Request");
                 throw new MinhaExcecao('Nome da Mãe Inválido');
@@ -53,12 +53,12 @@ class ValidarForm
 
 
 
-            require('backend\function\validarDataNascimento.php');
-            if (!ValidadordtNascimento($body->data_criacao, date_format(new DateTime('now'), 'd-m-Y'))) {
+            // require('backend\function\validarDataNascimento.php');
+            // if (!ValidadordtNascimento($body->data_criacao, date_format(new DateTime('now'), 'd-m-Y'))) {
 
-                header("HTTP/1.0 400 Bad Request");
-                throw new MinhaExcecao('Data de Nascimento Inválida!');
-            }
+            //     header("HTTP/1.0 400 Bad Request");
+            //     throw new MinhaExcecao('Data de Nascimento Inválida!');
+            // }
 
 
             require('backend\function\validarTelefone.php');

@@ -19,11 +19,13 @@
                 </span>
                 <div class="d-flex justify-center mt-10">
                     <div style="min-width: 320px;" class="mr-5 flex-grow-1">
-                        <span class="label">Usuário *</span>
+                        <span class="label">Nome da Mãe *</span>
                         <v-text-field
                             solo
-                            label="Seu @ aqui"
+                            label="Nome completo da sua mãe aqui"
                             color="#282455"
+                            v-model="nomeMae"
+                            :rules="[rules.required]"
                             class="rounded-xl mt-2"
                             height="65"
                         ></v-text-field>
@@ -33,6 +35,8 @@
                         <v-text-field
                             solo
                             label="Seu e-mail aqui"
+                            v-model="email"
+                            :rules="[rules.required, rules.email]"
                             color="#282455"
                             class="rounded-xl mt-2"
                             height="65"
@@ -49,14 +53,15 @@
                         class="rounded-lg" 
                         x-large 
                         width="600"
-                        @click="proximaPagina"
+                        :loading='loading'
+                        @click="recuperarSenha"
                     >
                         <strong>RECUPERAR SENHA</strong>
                     </v-btn>
                 </div>
             </div>
         </div>
-        <div v-else style="width: 100%;" class="d-flex flex-column justify-space-between">
+        <!-- <div v-else style="width: 100%;" class="d-flex flex-column justify-space-between">
             <div class="d-flex flex-column">
                 <span class="titulo2 align-self-start mt-10" style="color: #E94E3B;">
                     Recuperar Senha
@@ -114,27 +119,63 @@
                     <strong>VALIDAR</strong>
                 </v-btn>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
 <script>
+    import axios from '../../axios'
+    import { getToken } from '../../config'
+
     export default {
         name: 'CardEsqueciMinhaSenha',
         data: () => ({
             page: 0,
             radioGroup: null,
+            nomeMae: '',
+            email: null,
+            loading: false,
+            rules: {
+                required: value => !!value || 'Requerido.',
+                email: value => {
+                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                    return pattern.test(value) || 'E-mail inválido.'
+                }
+            },
         }),
         methods: {
+            async recuperarSenha() {
+
+                this.loading = true;
+
+                let body = {
+                    nome_mae: this.nomeMae,
+                    email: this.email
+                }
+
+                await axios.post('/recuperar_senha', body, getToken())
+                .then(() => {
+
+                    this.$root.$children[0].exibirMensagem('E-mail de recuperação de senha enviado com sucesso!', 'success');
+                    this.voltarLogin();
+                })
+                .catch(err => {
+
+                    this.$root.$children[0].exibirMensagem(err.response.data.errMsg);
+                })
+                .finally(() => {
+                    this.loading = false;
+                })
+            },
             voltarLogin() {
                 this.$emit('voltarLogin');
             },
-            proximaPagina() {
-                this.page++;
-            },
-            voltarPagina() {
-                this.page--;
-            }
+            // proximaPagina() {
+            //     this.page++;
+            // },
+            // voltarPagina() {
+            //     this.page--;
+            // }
         }
     }
 </script>

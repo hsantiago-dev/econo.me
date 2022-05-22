@@ -1,17 +1,17 @@
 <?php
 
-    require('backend\services\sessao.controller.php');
-    require('backend\conexao\conexao.php');
-    require('backend\model\Usuario.php');
-    require('backend\excecao\MinhaExcexao.php');
+    // require('backend\services\sessao.controller.php');
+    // require('backend\conexao\conexao.php');
+    // require('backend\model\Usuario.php');
+    // require('backend\excecao\MinhaExcexao.php');
 
     $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $bd = Conexao::get();
 
-    if(!$logado) {
+    // if(!$logado) {
 
-        return;
-    }
+    //     return;
+    // }
 
     if ($metodo == 'GET') {  
 

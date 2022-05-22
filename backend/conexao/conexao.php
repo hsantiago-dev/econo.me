@@ -10,7 +10,7 @@ class Conexao
         try {
             if (!isset(self::$instancia)) {
 
-                self::$instancia = new PDO('pgsql:host=localhost;dbname=econome','postgres','postgres123');
+                self::$instancia = new PDO('pgsql:host=localhost;dbname=econome','postgres','santi380');
                 return self::$instancia;
             }
         } catch (Exception $e) {

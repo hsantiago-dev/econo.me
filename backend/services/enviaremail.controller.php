@@ -37,7 +37,6 @@ class EnviarEmail
             // Define o remetente
             $this->mail->setFrom('utfprdev2019@gmail.com', 'Equipe de Suporte Econo.me');
             // Define o destinatário
-            print($usuario->email);
             $this->mail->addAddress($usuario->email, $usuario->nome);
             // Conteúdo da mensagem
             $this->mail->isHTML(true);  // Seta o formato do e-mail para aceitar conteúdo HTML
@@ -51,7 +50,7 @@ class EnviarEmail
                 
             } else {
 
-                throw new MinhaExcecao('A mensagem foi enviada!');
+                echo 'E-mail de recuperação enviado!';
             }
         } catch (MinhaExcecao $e) {
 
