@@ -53,24 +53,22 @@
                                 </div>
                             </template>
                             <template v-slot:[`item.abrir`]="{ item }">
-                                <v-dialog
-                                    v-model="dialogInfo"
-                                    width="1056"
+                                <v-btn 
+                                    elevation='1' 
+                                    color='#F2F4FA' 
+                                    @click="despesaSelecionada = item"
+                                    @click.stop='dialogInfo = true'
                                 >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn 
-                                            elevation='1' 
-                                            color='#F2F4FA' 
-                                            v-bind="attrs"
-                                            v-on="on"
-                                        >
-                                            <v-icon color='secondary'>fa-solid fa-money-check</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <CardInfoDespesa :despesa='item' @fecharDialog='dialogInfo = false; getDespesas()' />
-                                </v-dialog>
+                                    <v-icon color='secondary'>fa-solid fa-money-check</v-icon>
+                                </v-btn>
                             </template>
                         </v-data-table>
+                        <v-dialog
+                            v-model="dialogInfo"
+                            width="1056"
+                        >
+                            <CardInfoDespesa :despesa='despesaSelecionada' @fecharDialog='dialogInfo = false; getDespesas()' />
+                        </v-dialog>
                     </div>
                 </v-col>
             </v-row>
@@ -142,6 +140,7 @@
                 { text: 'Visualizar', value: 'abrir' },
             ],
             despesas: [],
+            despesaSelecionada: {}
         }),
         created() {
 

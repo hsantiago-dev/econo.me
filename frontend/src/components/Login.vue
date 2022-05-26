@@ -14,6 +14,7 @@
                     color="#282455"
                     class="mx-8 mx-md-14 mt-10 rounded-xl"
                     height="80"
+                    @keyup.enter='login'
                 ></v-text-field>
                 <v-text-field
                     solo
@@ -25,6 +26,7 @@
                     color="#282455"
                     class="mx-8 mx-md-14 rounded-xl"
                     height="80"
+                    @keyup.enter='login'
                 ></v-text-field>
                 <div class="d-flex flex-column align-center mx-8 mx-md-14 mt-4">
                     <v-btn 

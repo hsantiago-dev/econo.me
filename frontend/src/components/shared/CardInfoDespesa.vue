@@ -197,6 +197,10 @@
             this.tipoDespesa = aux;
         },
         watch: {
+            despesa: {
+                deep: true,
+                handler: 'getRateios'
+            },
             usuarios: {
                 deep: true,
                 handler: 'dividirRateio'
